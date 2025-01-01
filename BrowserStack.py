@@ -18,13 +18,13 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import StaleElementReferenceException, ElementClickInterceptedException, TimeoutException, JavascriptException
 import threading
 
-# Suppress SSL warnings globally
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# Setup logging for errors and missing images
+
 logging.basicConfig(filename="scraper_errors.log", level=logging.ERROR)
 
-# Function to handle cookies consent pop-up
+
 def handle_cookies(driver):
     try:
         consent_button = WebDriverWait(driver, 10).until(
@@ -34,7 +34,7 @@ def handle_cookies(driver):
     except Exception as e:
         logging.error(f"Error handling cookies consent: {e}")
 
-# Function to click an element with retries
+
 def click_element(driver, by, value):
     attempts = 3
     while attempts > 0:
@@ -51,16 +51,16 @@ def click_element(driver, by, value):
             break
     logging.error(f"Failed to click element: {value}")
 
-# Function to scrape articles and perform translations and analysis
+
 def scrape_and_analyze(driver):
     driver.get("https://elpais.com/")
     handle_cookies(driver)
 
-    # Click the Opinion section link
+   
     click_element(driver, By.CSS_SELECTOR, "a[href*='opinion']")
-    time.sleep(3)  # Wait for the page to load
+    time.sleep(3)  
 
-    # Scrape Articles
+   
     articles = driver.find_elements(By.CSS_SELECTOR, "article")[:5]
     titles = []
     contents = []
@@ -73,11 +73,11 @@ def scrape_and_analyze(driver):
             titles.append(title)
             contents.append(content)
 
-            # Print title and content in Spanish
+           
             print(f"Title: {title}")
             print(f"Content: {content}\n")
 
-            # Download cover image if available
+            
             img_element = article.find_elements(By.CSS_SELECTOR, "img")
             if img_element:
                 img_url = img_element[0].get_attribute("src")
@@ -91,36 +91,36 @@ def scrape_and_analyze(driver):
         except Exception as e:
             logging.error(f"Error processing article '{title}': {e}")
 
-    # Translate Article Headers
+   
     translator = GoogleTranslator(source='auto', target='en')
     translated_titles = [translator.translate(title) for title in titles]
 
-    # Print Translated Headers
+    
     print("\nTranslated Titles:")
     for title in translated_titles:
         print(title)
 
-    # Save Translated Titles to a File
+    
     with open("translated_titles.txt", "w", encoding="utf-8") as file:
         for title in translated_titles:
             file.write(title + "\n")
 
-    # Analyze Translated Headers
+    
     words = " ".join(translated_titles).split()
     word_counts = Counter(words)
     repeated_words = {word: count for word, count in word_counts.items() if count > 2}
 
-    # Print Repeated Words
+    
     print("\nRepeated Words:")
     for word, count in repeated_words.items():
         print(f"{word}: {count}")
 
-    # Save Repeated Words to a File
+    
     with open("repeated_words.txt", "w", encoding="utf-8") as file:
         for word, count in repeated_words.items():
             file.write(f"{word}: {count}\n")
 
-    # Sentiment Analysis of Titles
+   
     print("\nSentiment Analysis:")
     for title in translated_titles:
         sentiment = TextBlob(title).sentiment.polarity
@@ -133,7 +133,7 @@ def scrape_and_analyze(driver):
 
         print(f"Title: {title}\nSentiment: {sentiment_label}")
 
-    # Save Sentiment Analysis to a File
+    
     with open("sentiment_analysis.txt", "w", encoding="utf-8") as file:
         for title in translated_titles:
             sentiment = TextBlob(title).sentiment.polarity
@@ -146,7 +146,7 @@ def scrape_and_analyze(driver):
 
             file.write(f"Title: {title}\nSentiment: {sentiment_label}\n")
 
-    # Translation and Analytics Summary
+   
     print("\nTranslation Summary:")
     print(f"Total Articles Scraped: {len(titles)}")
     print(f"Valid Titles Scraped: {len(translated_titles)}")
@@ -154,13 +154,13 @@ def scrape_and_analyze(driver):
     print(f"Unique Words: {len(set(' '.join(translated_titles).split()))}")
     print(f"Most Common Words: {repeated_words}")
 
-# Function to run tests on BrowserStack
+
 def run_browserstack_test(capabilities, test_name):
     try:
-        # BrowserStack Hub URL
+        
         browserstack_url = f"https://{USERNAME}:{ACCESS_KEY}@hub.browserstack.com/wd/hub"
         
-        # Set up the WebDriver
+        
         options = ChromeOptions() if capabilities['browserName'] == 'Chrome' else (
             SafariOptions() if capabilities['browserName'] == 'Safari' else FirefoxOptions()
         )
@@ -172,19 +172,19 @@ def run_browserstack_test(capabilities, test_name):
             options=options
         )
         
-        # Example Test Actions
+       
         scrape_and_analyze(driver)
         
-        # End the session
+        
         driver.quit()
     except Exception as e:
         print(f"Error in test {test_name}: {e}")
 
-# Cross-Browser Testing on BrowserStack
+
 USERNAME = 'vinitshah_cSI85W'
 ACCESS_KEY = 'ou5hpexVaZiipBWXRAqy'
 
-# Define capabilities for different browsers
+
 capabilities_list = [
     {
         'bstack:options': {
@@ -233,7 +233,7 @@ capabilities_list = [
     }
 ]
 
-# Run tests in parallel using threading
+
 threads = []
 for i, capabilities in enumerate(capabilities_list):
     test_name = f"Test-{i + 1}"
@@ -241,7 +241,7 @@ for i, capabilities in enumerate(capabilities_list):
     threads.append(thread)
     thread.start()
 
-# Wait for all threads to complete
+
 for thread in threads:
     thread.join()
 
