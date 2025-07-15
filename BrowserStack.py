@@ -25,6 +25,8 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def greet(name):
     return f"Hello, {name}!"
+def greet(name):
+    return f"Hello, {name}!"
 
 
 logging.basicConfig(filename="scraper_errors.log", level=logging.ERROR)
