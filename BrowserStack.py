@@ -21,6 +21,11 @@ import threading
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+# main.py
+
+def greet(name):
+    return f"Hello, {name}!"
+
 
 logging.basicConfig(filename="scraper_errors.log", level=logging.ERROR)
 
